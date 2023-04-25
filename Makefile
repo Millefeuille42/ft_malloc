@@ -41,6 +41,10 @@ DEPS	=	$(addprefix $(DEPS_DIR), $(SOURCES:.$(SOURCES_EXTENSION)=.d))
 
 #########  Rules  #########
 
+ifeq ($(HOSTTYPE),)
+	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
+endif
+
 all:	$(OBJS_DIR) $(DEPS_DIR) $(NAME) ## Compile project and dependencies
 
 $(NAME):	$(OBJS) ## Compile project
