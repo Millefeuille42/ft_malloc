@@ -40,12 +40,18 @@ int is_chunk_in_zone(zone_ptr zone, chunk_ptr chunk) {
 	return chunk >= get_zone_first_chunk(zone) && chunk <= get_zone_end(zone);
 }
 
+size_t get_zone_space_left_from_chunk(zone_ptr zone, chunk_ptr chunk) {
+	size_t end_offset = (char *) get_chunk_end(chunk) - (char *) zone;
+	return get_zone_size(zone) - end_offset;
+}
+
 chunk_ptr zone_malloc(zone_ptr zone, size_t size, size_t real_size) {
-	if (size > zone->_size_add || size > get_zone_max_size(zone))
+	if (size > zone->_size || size > get_zone_max_size(zone))
 		return NULL;
 	chunk_ptr current = get_zone_first_chunk(zone);
 	if (!current->_size) {
 		current->next = NULL;
+		current->prev = NULL;
 		current->_size = size;
 		current->_size_add = real_size;
 		set_chunk_busy(current);
@@ -56,15 +62,15 @@ chunk_ptr zone_malloc(zone_ptr zone, size_t size, size_t real_size) {
 		if (is_chunk_free(current) && get_chunk_size(current) >= size)
 			return current;
 	}
-	if (sizeof(chunk_header) + size > zone->_size_add)
+	if (sizeof(chunk_header) + size > get_zone_space_left_from_chunk(zone, current))
 		return NULL;
 
 	current->next = get_chunk_end(current);
 	current->next->next = NULL;
+	current->next->prev = current;
 	current->next->_size = size;
 	current->next->_size_add = real_size;
 	set_chunk_busy(current->next);
-	zone->_size_add -= size;
 
 	return current->next;
 }
@@ -74,11 +80,10 @@ zone_ptr new_zone(int small) {
 	if (small)
 		size = manager.small_size;
 	zone_ptr ret = allocate(NULL, size);
-	if (!ret)
+	if (!ret || errno == ENOMEM)
 		return NULL;
 	ret->next = NULL;
 	ret->_size = size;
-	ret->_size_add = size;
 	small ? set_zone_small(ret) : set_zone_tiny(ret);
 	return ret;
 }

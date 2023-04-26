@@ -16,20 +16,21 @@ chunk_ptr append_to_list(chunk_ptr start, chunk_ptr chunk) {
 	chunk_ptr current = chunk;
 	for (; current->next; current = current->next);
 	current->next = chunk;
+	current->next->prev = current;
 	return start;
 }
 
 void *malloc_in_zone(size_t size, size_t real_size) {
 	if (size > manager.small_max_size) {
 		chunk_ptr ret = allocate(NULL, size);
-		if (!ret)
+		if (!ret || errno == ENOMEM)
 			return NULL;
 		ret->next = NULL;
 		ret->_size = size;
 		ret->_size_add = real_size;
 		set_chunk_busy(ret);
 		manager.large_allocs = append_to_list(manager.large_allocs, ret);
-		return ret;
+		return head_to_mem(ret);
 	}
 
 	zone_ptr *zone = &manager.tiny_zones;
@@ -39,10 +40,8 @@ void *malloc_in_zone(size_t size, size_t real_size) {
 	zone_ptr current = *zone;
 	for (; current; current = current->next) {
 		chunk_ptr ret = zone_malloc(current, size, real_size);
-		if (ret) {
-			*zone = append_to_list(*zone, ret);
+		if (ret)
 			return head_to_mem(ret);
-		}
 	}
 
 	*zone = new_zone(size > manager.tiny_max_size);
