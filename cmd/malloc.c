@@ -5,174 +5,63 @@
 #include "ft_malloc.h"
 
 void *allocate(void *addr, size_t size) {
-	if (manager.total_allocations + size >= manager.limit.rlim_cur)
-		return NULL;
 	return mmap(addr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
 
-void init(void) {
-	manager.tiny_zone_size = getpagesize();
-	manager.tiny_zone_max = manager.tiny_zone_size / 128;
-	manager.medium_zone_size = getpagesize() * 16;
-	manager.medium_zone_max = manager.medium_zone_size / 128;
-	manager.total_allocations = 0;
-	manager.tiny_zones = NULL;
-	manager.medium_zones = NULL;
-	getrlimit(RLIMIT_AS, &manager.limit);
+chunk_ptr append_to_list(chunk_ptr start, chunk_ptr chunk) {
+	if (!chunk)
+		return start;
+	if (!start)
+		return chunk;
+	chunk_ptr current = chunk;
+	for (; current->next; current = current->next);
+	current->next = chunk;
+	return start;
 }
 
-zone_registry *new_zone(size_t size) {
-	zone_registry *ret = allocate(NULL, sizeof(zone_registry));
-	if (!ret)
-		return NULL;
-	*ret = (zone_registry) {
-			.entries = NULL,
-			.next = NULL,
-			.start = allocate(NULL, size),
-			.size = size
-	};
-	if (!ret->start) {
-		free(ret);
-		return NULL;
-	}
-	return ret;
-}
-
-registry_entry *new_entry(void *start, size_t size) {
-	registry_entry *ret = allocate(NULL, sizeof(zone_registry));
-	if (!ret)
-		return NULL;
-	*ret = (registry_entry) {
-		.size = size,
-		.next = NULL,
-		.start = start,
-		.free = true
-	};
-	return ret;
-}
-
-char *get_entry_end(registry_entry *entry) {
-	return (char *) entry->start + entry->size;
-}
-
-void *get_next_free_entry(zone_registry *zones, size_t entry_size, size_t zone_size) {
-	size_t smallest_size = entry_size;
-	registry_entry *smallest_entry = NULL;
-
-	for (zone_registry *current = zones; current; current = current->next) {
-		registry_entry *entries = current->entries;
-		for (; entries->next; entries = entries->next) {
-			if (entries->free && entries->size >= entry_size) {
-				if (entries->size == entry_size)
-					return entries;
-				if (entries->size < smallest_size) {
-					smallest_entry = entries;
-					smallest_size = entries->size;
-				}
-			}
-		}
-		if (smallest_entry)
-			return smallest_entry;
-		if (get_entry_end(entries) + entry_size <= (char *) current->start + zone_size){
-			entries->next = new_entry(get_entry_end(entries), entry_size);
-			return entries->next;
-		}
-		if (!current->next)
-			zones = current;
-	}
-	zones->next = new_zone(zone_size);
-	if (!zones->next)
-		return NULL;
-	zones->next->entries = new_entry(zones->next->start, entry_size);
-	return zones->next->entries;
-}
-
-registry_entry *get_next_addr(zone_registry **zones, size_t entry_size, size_t zone_size) {
-	if (!zones)
-		return NULL;
-
-	if (!*zones) {
-		*zones = new_zone(zone_size);
-		if (!*zones)
+void *malloc_in_zone(size_t size, size_t real_size) {
+	if (size > manager.small_max_size) {
+		chunk_ptr ret = allocate(NULL, size);
+		if (!ret)
 			return NULL;
+		ret->next = NULL;
+		ret->_size = size;
+		ret->_size_add = real_size;
+		set_chunk_busy(ret);
+		manager.large_allocs = append_to_list(manager.large_allocs, ret);
+		return ret;
 	}
 
-	if (!(*zones)->entries) {
-		(*zones)->entries = new_entry((*zones)->start, entry_size);
-		if (!(*zones)->entries)
-			return NULL;
-		return (*zones)->entries;
-	}
+	zone_ptr *zone = &manager.tiny_zones;
+	if (size > manager.tiny_max_size)
+		zone = &manager.small_zones;
 
-	return get_next_free_entry(*zones, entry_size, zone_size);
-}
-
-int is_printable(int c) {
-	return c >= 32 && c <= 126;
-}
-
-void print_memory(void *start, size_t size) {
-	char *ptr = start;
-	size_t printed_char = 0;
-	for (size_t i = 0; i < size; i++) {
-		char c = ptr[i];
-		if (!c)
-			c = '.';
-		if (!is_printable(c))
-			c = '_';
-		write(1, &c, 1);
-		printed_char++;
-		if (printed_char > 64) {
-			write(1, "\n", 1);
-			printed_char = 0;
+	zone_ptr current = *zone;
+	for (; current; current = current->next) {
+		chunk_ptr ret = zone_malloc(current, size, real_size);
+		if (ret) {
+			*zone = append_to_list(*zone, ret);
+			return head_to_mem(ret);
 		}
 	}
-	write(1, "\n", 1);
+
+	*zone = new_zone(size > manager.tiny_max_size);
+	if (!*zone)
+		return NULL;
+	chunk_ptr chunk = zone_malloc(*zone, size, real_size);
+	if (!chunk)
+		return NULL;
+	return head_to_mem(chunk);
 }
 
-void print_entries(registry_entry *entries) {
-	for (registry_entry *current = entries; current; current = current->next) {
-		if (current->free)
-			continue;
-		printf("\t%p-%p : %4.4zu bytes \n", current->start, (void *) ((char *) current->start + current->size), current->size);
-		//print_memory(current->start, current->size);
-	}
-}
-
-void print_zones(zone_registry *zones) {
-	for (zone_registry *current = zones; current; current = current->next) {
-		printf("%p\n", current->start);
-		print_entries(current->entries);
-		//print_memory(current->start, size);
-	}
-}
-
-void show_alloc_mem(void) {
-	if (manager.tiny_zones) {
-		printf("TINY :\n");
-		print_zones(manager.tiny_zones);
-	}
-	if (manager.medium_zones) {
-		printf("\nMEDIUM :\n");
-		print_zones(manager.medium_zones);
-	}
+size_t compute_aligned_size(size_t size) {
+	return size + (8 - (size % 8));
 }
 
 void *malloc(size_t size) {
-	if (!manager.tiny_zone_max)
-		init();
+	init_manager();
 	if (size <= 0)
 		return NULL;
-	if (size > manager.medium_zone_max)
-		return allocate(NULL, size);
-
-	registry_entry *ret = NULL;
-	if (size > manager.tiny_zone_max)
-		ret = get_next_addr(&manager.medium_zones, size, manager.medium_zone_size);
-	else
-		ret = get_next_addr(&manager.tiny_zones, size, manager.tiny_zone_size);
-	if (!ret)
-		return NULL;
-	ret->free = false;
-	return ret->start;
+	size_t aligned_size = compute_aligned_size(size);
+	return malloc_in_zone(aligned_size, size);
 }

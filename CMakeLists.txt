@@ -12,7 +12,7 @@ set(SOURCE_MALLOC
 		cmd/malloc.c
 		cmd/free.c
 		cmd/realloc.c
-)
+		cmd/manager.c cmd/chunk.c cmd/zone.c)
 
 add_executable(malloc ${SOURCE_MALLOC})
 target_link_libraries(malloc LINK_PUBLIC)
