@@ -2,10 +2,14 @@
 // Created by millefeuille on 4/25/23.
 //
 
-#include "ft_malloc.h"
+#include <stdio.h>
+
+#include "malloc.h"
+
+//include <stdlib.h>
 
 int main(void) {
-	for (int i = 0; i < 100000000; i++) {
+	for (int i = 0; i < 1000000; i++) {
 		free(malloc(1000000000));
 	}
 

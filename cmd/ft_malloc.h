@@ -46,6 +46,7 @@ extern memory_manager manager;
 void init_manager(void);
 
 void *allocate(void *addr, size_t size);
+size_t compute_aligned_size(size_t size);
 
 int is_chunk_free(chunk_ptr chunk);
 void set_chunk_busy(chunk_ptr chunk);
@@ -54,7 +55,8 @@ chunk_ptr get_chunk_end(chunk_ptr chunk);
 size_t get_chunk_size(chunk_ptr chunk);
 size_t get_chunk_full_size(chunk_ptr chunk);
 void *head_to_mem(chunk_ptr chunk);
-chunk_header *mem_to_head(void *ptr);
+chunk_ptr mem_to_head(void *ptr);
+zone_ptr find_zone_of_chunk(chunk_ptr chunk);
 
 int is_zone_small(zone_ptr zone);
 void set_zone_small(zone_ptr zone);

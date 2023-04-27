@@ -4,14 +4,6 @@
 
 #include "ft_malloc.h"
 
-zone_ptr find_zone_of_chunk(chunk_ptr chunk) {
-	zone_ptr zone = manager.tiny_zones;
-	if (get_chunk_size(chunk) > manager.tiny_max_size)
-		zone = manager.small_zones;
-	for (; zone && !is_chunk_in_zone(zone, chunk); zone = zone->next);
-	return zone;
-}
-
 void free(void *ptr) {
 	if (!ptr)
 		return;
@@ -23,8 +15,12 @@ void free(void *ptr) {
 	for (; chunk && is_chunk_free(chunk) && !chunk->next; chunk = prev) { // Iterate backward while chunk exists and is free
 		prev = chunk->prev;
 		size_t size = get_chunk_size(chunk);
-		if (!prev && size <= manager.small_max_size) // If reaching first chunk of a zone, set 'first' to unmap said zone
-			first = chunk;
+		if (!prev) { // If reaching first chunk of a zone, set 'first' to unmap said zone
+			if (size > manager.small_max_size)
+				manager.large_allocs = NULL;
+			else
+				first = chunk;
+		}
 		*chunk = (chunk_header) {.prev = NULL, .next = NULL, ._size = 0, ._size_add = 0};
 		if (size > manager.small_max_size) // If it is a fitted chunk, unmap it
 			munmap(chunk, size);

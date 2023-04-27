@@ -37,3 +37,11 @@ void *head_to_mem(chunk_ptr header) {
 chunk_ptr mem_to_head(void *ptr) {
 	return (chunk_ptr) ((char *) ptr - sizeof(chunk_header));
 }
+
+zone_ptr find_zone_of_chunk(chunk_ptr chunk) {
+	zone_ptr zone = manager.tiny_zones;
+	if (get_chunk_size(chunk) > manager.tiny_max_size)
+		zone = manager.small_zones;
+	for (; zone && !is_chunk_in_zone(zone, chunk); zone = zone->next);
+	return zone;
+}

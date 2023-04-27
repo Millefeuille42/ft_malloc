@@ -4,10 +4,6 @@
 
 #include "ft_malloc.h"
 
-void *allocate(void *addr, size_t size) {
-	return mmap(addr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-}
-
 chunk_ptr append_to_list(chunk_ptr start, chunk_ptr chunk) {
 	if (!chunk)
 		return start;
@@ -51,10 +47,6 @@ void *malloc_in_zone(size_t size, size_t real_size) {
 	if (!chunk)
 		return NULL;
 	return head_to_mem(chunk);
-}
-
-size_t compute_aligned_size(size_t size) {
-	return size + (8 - (size % 8));
 }
 
 void *malloc(size_t size) {

@@ -7,12 +7,17 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Werror -Wextra -pedantic"
 
 set(SOURCE_MALLOC
 		cmd/main.c
-		cmd/malloc.h
-		cmd/ft_malloc.h
 		cmd/malloc.c
 		cmd/free.c
 		cmd/realloc.c
-		cmd/manager.c cmd/chunk.c cmd/zone.c)
+		cmd/manager.c
+		cmd/chunk.c
+		cmd/zone.c
+		cmd/utils.c
+		cmd/utils.c
+		cmd/malloc.h
+		cmd/ft_malloc.h
+)
 
 add_executable(malloc ${SOURCE_MALLOC})
 target_link_libraries(malloc LINK_PUBLIC)
