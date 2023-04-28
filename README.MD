@@ -93,8 +93,8 @@ The size of the provided data is only here for debug information and `show_alloc
 
 #### Pros and cons
 The pros of overhead instead of exported bookkeeping is that it is way faster
-to retrieve data related to a chunk with a pointer to its data field (in free or realloc for example)
-since it only required to subtract the header size to the pointer to retrieve it header.
+to retrieve data related to a chunk with a pointer (in free or realloc for example)
+since it only required to subtract the header size to the pointer to retrieve its header.
 
 It also takes less space since it does not contain pointers to data.
 
