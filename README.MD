@@ -122,8 +122,8 @@ they will be joined as a single chunk, again, to prevent fragmentation.
 ### free
 When calling free, if the size is not too high for a bin (then it will just unmap the chunk and sort out next/prev pointers)
 it will check if the provided chunk is at the end of a bin, if so, the chunk will be
-de-attributed, then it will iterate backward to find contiguous chunks to de-attribute them,
-This helps to prevent bin fragmentation.
+de-attributed then it will iterate backward to find contiguous chunks to de-attribute them,
+this helps to prevent bin fragmentation.
 
 If the bin ends up being empty, it is de-allocated to reduce the program's memory footprint.
 
@@ -135,13 +135,14 @@ it will run a few checks :
 
 - If the new size is lesser than the current real size, it will adjust the chunk's real size and return the provided pointer.
 
-- If it is greater, but lesser than the chunk's data size, it will adjust the chunk's real size and return the provided pointer.
+- If it is greater than the current real size, but lesser than the chunk's data size, 
+  it will adjust the chunk's real size and return the provided pointer.
 
 In the two previous cases, if the chunk is at the end of a bin, the chunk will be expanded (if there is enough space left)
 or trimmed to fit the new size.
 
 - If the new size is greater than the chunk's data size (or bin's left size if it is at the end of a bin)
-  it will simply store the chunk's data in a buffer, free the chunk, call malloc to get a new chunk and copy the buffer
+  it will store the chunk's data in a buffer, free the chunk, call malloc to get a new chunk and copy the buffer
   into the new chunk's data.
 
 In a similar fashion. if the size is too big for a bin, it will try to expand or trim the chunk with `mmap`,
@@ -154,4 +155,4 @@ None of the bonuses really requires an explanation, besides eventually de-fragme
 Preventing fragmentation is already covered in the mandatory part (to be fair, if one wants to do this bonus, it is recommended to code the mandatory part
 with de-fragmentation in mind...).
 
-Planning make malloc thread-safe since it seems to be quite easy.
+Planning to make malloc thread-safe since it seems to be quite easy.
