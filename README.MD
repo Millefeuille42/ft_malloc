@@ -6,11 +6,11 @@ Rewrite `malloc` `free` and `realloc` functions.
 
 also write a `show_alloc_mem` function to printing memory allocations.
 
-Like the real malloc, the allocated memory must be stored in pre-allocated 
+Like the real malloc, the allocated memory must be stored in pre-allocated
 "zones" (**bins**), unless the requested size is too big, then the allocation must
 be **fitted**.
 
-Two zones are required: 
+Two zones are required:
 - Tiny zones of **N** size, storing allocations from 0 to **n** size
 - Small zones of **M** size, storing allocations from **n**+1 to **m** size
 - Larges allocations, fitted allocations beginning from **m**+1
@@ -44,12 +44,12 @@ the name of the architecture.
 Aligning memory corresponds to set variables on start of **4/8 bytes** sections.
 If this is not respected, it raises :
 
-- **Constraint violation**: an alignment error interrupts the execution of 
-instructions.
+- **Constraint violation**: an alignment error interrupts the execution of
+  instructions.
 
-- **Non-optimal alignment**: twice 4 well-aligned bytes are read, 
-then the 4 misaligned bytes are extracted from these 8 bytes, 
-which takes much longer than reading 4 well-aligned bytes.
+- **Non-optimal alignment**: twice 4 well-aligned bytes are read,
+  then the 4 misaligned bytes are extracted from these 8 bytes,
+  which takes much longer than reading 4 well-aligned bytes.
 
 Considering this, compilers will automatically align memory when possible
 by padding memory with `char`, meaning that, when the fields of a structure
@@ -63,7 +63,7 @@ careful with alignement, to prevent unnecessary slowdowns.
 Every memory "allocation" (bin or fitted) is preceded by a header.
 The combination of a memory "allocation" (**data**) and it's header is called a **chunk**.
 
-The header bears the following information : 
+The header bears the following information :
 - Allocation size (`unsigned long`)
 - Allocation real size (`unsigned long`)
 - Pointer to next chunk (`void *`)
@@ -75,7 +75,7 @@ The data size is always set to a multiple of 8, this forces
 memory alignement on every architecture.
 
 The data size is often larger than what was asked, to keep memory aligned.
-The portion of data that matches the size asked by the user (**real size**) is called 
+The portion of data that matches the size asked by the user (**real size**) is called
 **provided data**, the remainder is called **tail**.
 
 To sum things up, this is how a chunk is organised in memory (assuming a line is 4/8 bytes) :
@@ -104,7 +104,7 @@ The cons are that a non-cautious user writing out of provided data bounds might 
 the bookkeeping data and ruin malloc... But well, nobody is supposed to write out of bounds right ?
 
 ### Bins
-In the similar way as a chunk, bins have a preceding header, 
+In the similar way as a chunk, bins have a preceding header,
 the only differences are that the size corresponds to the full zone size, header included,
 and that the real size field is unused and that pointers point to bins instead of chunks.
 
@@ -121,7 +121,7 @@ they will be joined as a single chunk, again, to prevent fragmentation.
 
 ### free
 When calling free, if the size is not too high for a bin (then it will just unmap the chunk and sort out next/prev pointers)
-it will check if the provided chunk is at the end of a bin, if so, the chunk will be 
+it will check if the provided chunk is at the end of a bin, if so, the chunk will be
 de-attributed, then it will iterate backward to find contiguous chunks to de-attribute them,
 This helps to prevent bin fragmentation.
 
@@ -141,11 +141,11 @@ In the two previous cases, if the chunk is at the end of a bin, the chunk will b
 or trimmed to fit the new size.
 
 - If the new size is greater than the chunk's data size (or bin's left size if it is at the end of a bin)
-it will simply store the chunk's data in a buffer, free the chunk, call malloc to get a new chunk and copy the buffer
-into the new chunk's data.
+  it will simply store the chunk's data in a buffer, free the chunk, call malloc to get a new chunk and copy the buffer
+  into the new chunk's data.
 
 In a similar fashion. if the size is too big for a bin, it will try to expand or trim the chunk with `mmap`,
-if it worked, chunk's size and real size is changed accordingly and the provided pointer is returned. 
+if it worked, chunk's size and real size is changed accordingly and the provided pointer is returned.
 If it did not work, it will copy the chunk's data to the new chunk and return a pointer to the new chunk's data.
 
 ## Bonus part code explanation (WIP)
