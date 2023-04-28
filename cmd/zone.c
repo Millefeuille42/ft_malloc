@@ -53,7 +53,7 @@ chunk_ptr zone_malloc(zone_ptr zone, size_t size, size_t real_size) {
 		current->next = NULL;
 		current->prev = NULL;
 		current->_size = size;
-		current->_size_add = real_size;
+		current->real_size = real_size;
 		set_chunk_busy(current);
 		return current;
 	}
@@ -69,7 +69,7 @@ chunk_ptr zone_malloc(zone_ptr zone, size_t size, size_t real_size) {
 	current->next->next = NULL;
 	current->next->prev = current;
 	current->next->_size = size;
-	current->next->_size_add = real_size;
+	current->next->real_size = real_size;
 	set_chunk_busy(current->next);
 
 	return current->next;

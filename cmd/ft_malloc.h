@@ -17,7 +17,7 @@
 
 typedef struct s_chunk_header {
 	size_t _size;					// Size of chunk / zone. If size is odd, chunk is free / zone is small and real size is += 1
-	size_t _size_add;				// Real size of chunk / unused on zone
+	size_t real_size;				// Real size of chunk / unused on zone
 	struct s_chunk_header *next;	// Pointer to next chunk / zone
 	struct s_chunk_header *prev;	// Pointer to prev chunk / zone
 } chunk_header;						// Total size 8 - 16 bytes

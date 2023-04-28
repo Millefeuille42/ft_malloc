@@ -43,7 +43,7 @@ void print_chunk_data(char *start, size_t size) {
 }
 
 void print_chunk_header(chunk_ptr chunk) {
-	print_chunk_data(head_to_mem(chunk), chunk->_size_add);
+	print_chunk_data(head_to_mem(chunk), chunk->real_size);
 #ifdef FT_MALLOC_DEBUG
 	ft_putstr(" -- (");
 	print_chunk_data((char *)chunk, get_chunk_size(chunk));
@@ -74,7 +74,7 @@ void print_zones(zone_ptr zone) {
 		return;
 
 	for (; zone; zone = zone->next) {
-		if (zone->_size > manager.tiny_size)
+		if (is_zone_small(zone))
 			ft_putstr("SMALL : ");
 		else
 			ft_putstr("TINY : ");

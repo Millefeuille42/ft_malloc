@@ -10,20 +10,23 @@ void free(void *ptr) {
 	chunk_ptr chunk = mem_to_head(ptr);
 	set_chunk_free(chunk);
 
+	if (get_chunk_size(chunk) > manager.small_max_size) {
+		if (chunk->prev)
+			chunk->prev->next = chunk->next;
+		else
+			manager.large_allocs = chunk->next;
+		if (chunk->next)
+			chunk->next->prev = chunk->prev;
+		munmap(chunk, get_chunk_size(chunk) + sizeof(chunk_header));
+	}
+
 	chunk_ptr prev = NULL;
 	chunk_ptr first = NULL;
 	for (; chunk && is_chunk_free(chunk) && !chunk->next; chunk = prev) { // Iterate backward while chunk exists and is free
 		prev = chunk->prev;
-		size_t size = get_chunk_size(chunk);
-		if (!prev) { // If reaching first chunk of a zone, set 'first' to unmap said zone
-			if (size > manager.small_max_size)
-				manager.large_allocs = NULL;
-			else
-				first = chunk;
-		}
-		*chunk = (chunk_header) {.prev = NULL, .next = NULL, ._size = 0, ._size_add = 0};
-		if (size > manager.small_max_size) // If it is a fitted chunk, unmap it
-			munmap(chunk, size);
+		if (!prev) // If reaching first chunk of a zone, set 'first' to unmap said zone
+			first = chunk;
+		*chunk = (chunk_header) {.prev = NULL, .next = NULL, ._size = 0, .real_size = 0};
 		if (prev)
 			prev->next = NULL;
 	}
@@ -41,6 +44,6 @@ void free(void *ptr) {
 	} else
 		zone->prev->next = zone->next;
 	size_t size = zone->_size;
-	*zone = (zone_header) {.prev = NULL, .next = NULL, ._size = 0, ._size_add = 0};
+	*zone = (zone_header) {.prev = NULL, .next = NULL, ._size = 0, .real_size = 0};
 	munmap(zone, size);
 }

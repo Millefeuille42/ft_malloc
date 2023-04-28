@@ -5,12 +5,43 @@
 #include "ft_malloc.h"
 
 void *reallocate_chunk(chunk_ptr chunk, size_t real_size) {
+	// TODO this needs a buffer to really de-frag memory
 	void *new_ptr = malloc(real_size);
 	if (!new_ptr)
 		return NULL;
-	ft_memcpy(head_to_mem(chunk), new_ptr, chunk->_size_add);
+	ft_memcpy(head_to_mem(chunk), new_ptr, chunk->real_size);
 	free(head_to_mem(chunk));
 	return new_ptr;
+}
+
+void *reallocate_fitted_chunk(chunk_ptr chunk, size_t real_size, size_t size) {
+	chunk_ptr ret = allocate(chunk, size);
+	if (!ret || errno == ENOMEM)
+		return NULL;
+	if (ret == chunk) {
+		ret->_size = size;
+		ret->real_size = real_size;
+		return head_to_mem(ret);
+	}
+
+	if (get_chunk_size(chunk) > real_size)
+		ft_memcpy(head_to_mem(ret), head_to_mem(chunk), get_chunk_size(chunk));
+	else
+		ft_memcpy(head_to_mem(ret), head_to_mem(chunk), real_size);
+
+	ret->prev = chunk->prev;
+	ret->next = chunk->next;
+	if (ret->prev)
+		ret->prev->next = ret;
+	else
+		manager.large_allocs = ret;
+	if (ret->next)
+		ret->next->prev = ret;
+	ret->_size = size;
+	ret->real_size = real_size;
+	munmap(chunk, get_chunk_size(chunk) + sizeof(chunk_header));
+
+	return head_to_mem(ret);
 }
 
 void *realloc(void *ptr, size_t size) {
@@ -24,27 +55,12 @@ void *realloc(void *ptr, size_t size) {
 		return ptr;
 
 	zone_ptr zone = find_zone_of_chunk(chunk);
-	if (!zone) {
-		size_t old_size = chunk->_size_add;
-		chunk->_size = size;
-		chunk->_size_add = real_size;
-
-		void *new_ptr = allocate(ptr, size);
-		if (new_ptr == ptr)
-			return ptr;
-
-		if (old_size > real_size)
-			ft_memcpy(new_ptr, ptr, old_size);
-		else
-			ft_memcpy(new_ptr, ptr, real_size);
-
-		return new_ptr;
-	}
-
+	if (!zone)
+		return reallocate_fitted_chunk(chunk, real_size, size);
 	if (get_chunk_size(chunk) > size) {
 		if (!chunk->next)
 			chunk->_size = size;
-		chunk->_size_add = real_size;
+		chunk->real_size = real_size;
 		return ptr;
 	}
 
@@ -52,7 +68,7 @@ void *realloc(void *ptr, size_t size) {
 		if (size > get_zone_space_left_from_chunk(zone, chunk))
 			return reallocate_chunk(chunk, real_size);
 		chunk->_size = size;
-		chunk->_size_add = real_size;
+		chunk->real_size = real_size;
 		return ptr;
 	}
 
@@ -66,7 +82,7 @@ void *realloc(void *ptr, size_t size) {
 	if (free_size >= size) {
 		chunk->next = NULL;
 		chunk->_size = size;
-		chunk->_size_add = real_size;
+		chunk->real_size = real_size;
 		return ptr;
 	}
 

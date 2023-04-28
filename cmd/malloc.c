@@ -4,6 +4,8 @@
 
 #include "ft_malloc.h"
 
+// TODO like in calloc, perform contiguous free zones check to help with de-frag
+
 chunk_ptr append_to_list(chunk_ptr start, chunk_ptr chunk) {
 	if (!chunk)
 		return start;
@@ -23,7 +25,7 @@ void *malloc_in_zone(size_t size, size_t real_size) {
 			return NULL;
 		ret->next = NULL;
 		ret->_size = size;
-		ret->_size_add = real_size;
+		ret->real_size = real_size;
 		set_chunk_busy(ret);
 		manager.large_allocs = append_to_list(manager.large_allocs, ret);
 		return head_to_mem(ret);
