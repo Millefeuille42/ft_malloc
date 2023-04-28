@@ -70,7 +70,7 @@ The header bears the following information :
 - Pointer to previous chunk (`void *`)
 
 For a total of **16/32 bytes** on **32/64 bits** architectures. The structure
-itself if memory aligned and the start of the data is also aligned.
+itself is memory aligned and the start of the data is also aligned.
 The data size is always set to a multiple of 8, this forces
 memory alignement on every architecture.
 
