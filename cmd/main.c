@@ -4,15 +4,11 @@
 
 #include <stdio.h>
 
-#include "malloc.h"
+#include "./malloc.h"
 
 //include <stdlib.h>
 
 int main(void) {
-	for (int i = 0; i < 1000000; i++) {
-		free(malloc(1000000000));
-	}
-
 	char *test = malloc(2);
 	if (test == NULL)
 		return 0;
@@ -24,10 +20,10 @@ int main(void) {
 	test2[0] = 'b';
 	test2[1] = '\0';
 
-	//show_alloc_mem();
+	show_alloc_mem();
 
-	printf("%p = %s\n", (void *) test, test);
-	printf("%p = %s\n", (void *) test2, test2);
+	//printf("%p = %s\n", (void *) test, test);
+	//printf("%p = %s\n", (void *) test2, test2);
 	free(test);
 	free(test2);
 }

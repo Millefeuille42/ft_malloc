@@ -2,18 +2,18 @@
 // Created by millefeuille on 4/25/23.
 //
 
-#ifndef FT_LS_FT_MALLOC_H
-# define FT_LS_FT_MALLOC_H
+#ifndef FT_MALLOC_H
+# define FT_MALLOC_H
 
 # pragma clang diagnostic ignored "-Wincompatible-library-redeclaration"
 
 # include "malloc.h"
+# include "../pkg/ft_print/ft_print.h"
+
 # include <sys/mman.h>
 # include <sys/resource.h>
-# include <unistd.h>
 # include <stdio.h>
 # include <errno.h>
-
 
 typedef struct s_chunk_header {
 	size_t _size;					// Size of chunk / zone. If size is odd, chunk is free / zone is small and real size is += 1
@@ -71,4 +71,4 @@ int is_chunk_in_zone(zone_ptr zone, chunk_ptr chunk);
 chunk_ptr zone_malloc(zone_ptr zone, size_t size, size_t real_size);
 zone_ptr new_zone(int small);
 
-#endif //FT_LS_FT_MALLOC_H
+#endif //FT_MALLOC_H

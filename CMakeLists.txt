@@ -10,13 +10,19 @@ set(SOURCE_MALLOC
 		cmd/malloc.c
 		cmd/free.c
 		cmd/realloc.c
+		cmd/show_alloc_mem.c
 		cmd/manager.c
 		cmd/chunk.c
 		cmd/zone.c
 		cmd/utils.c
-		cmd/utils.c
 		cmd/malloc.h
 		cmd/ft_malloc.h
+
+		pkg/ft_print/ft_putchar.c
+		pkg/ft_print/ft_putnbr.c
+		pkg/ft_print/ft_putstr.c
+		pkg/ft_print/ft_print.h
+		pkg/ft_print/ft_putnbr_base.c
 		)
 
 add_executable(malloc ${SOURCE_MALLOC})
