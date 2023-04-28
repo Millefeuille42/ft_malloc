@@ -17,7 +17,7 @@ set(SOURCE_MALLOC
 		cmd/utils.c
 		cmd/malloc.h
 		cmd/ft_malloc.h
-)
+		)
 
 add_executable(malloc ${SOURCE_MALLOC})
 target_link_libraries(malloc LINK_PUBLIC)

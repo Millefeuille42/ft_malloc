@@ -11,3 +11,8 @@ void *allocate(void *addr, size_t size) {
 size_t compute_aligned_size(size_t size) {
 	return size + (8 - (size % 8));
 }
+
+void ft_memcpy (char *dest, const char *src, size_t size){
+	for (size_t i = 0; i < size; i++)
+		dest[i] = src[i];
+}

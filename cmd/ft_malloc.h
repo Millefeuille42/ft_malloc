@@ -14,7 +14,6 @@
 # include <stdio.h>
 # include <errno.h>
 
-typedef unsigned long size_t;
 
 typedef struct s_chunk_header {
 	size_t _size;					// Size of chunk / zone. If size is odd, chunk is free / zone is small and real size is += 1
@@ -47,6 +46,7 @@ void init_manager(void);
 
 void *allocate(void *addr, size_t size);
 size_t compute_aligned_size(size_t size);
+void ft_memcpy (char *dest, const char *src, size_t size);
 
 int is_chunk_free(chunk_ptr chunk);
 void set_chunk_busy(chunk_ptr chunk);
