@@ -7,6 +7,8 @@
 
 # pragma clang diagnostic ignored "-Wincompatible-library-redeclaration"
 
+# define FT_MALLOC_DEBUG 1
+
 # include "malloc.h"
 # include "../pkg/ft_print/ft_print.h"
 

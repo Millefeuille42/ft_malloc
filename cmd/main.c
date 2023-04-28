@@ -5,10 +5,14 @@
 #include <stdio.h>
 
 #include "./malloc.h"
-
+# include <sys/mman.h>
 //include <stdlib.h>
 
 int main(void) {
+	void *addr = mmap(NULL, 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	printf("Hi, my name is %p\n", addr);
+	printf("Hi, my name is %p\n", addr);
+
 	char *test = malloc(2);
 	if (test == NULL)
 		return 0;

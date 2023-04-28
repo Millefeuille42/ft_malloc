@@ -46,7 +46,7 @@ void print_chunk_header(chunk_ptr chunk) {
 	print_chunk_data(head_to_mem(chunk), chunk->real_size);
 #ifdef FT_MALLOC_DEBUG
 	ft_putstr(" -- (");
-	print_chunk_data((char *)chunk, get_chunk_size(chunk));
+	print_chunk_data((char *)chunk, get_chunk_size(chunk) + sizeof(chunk_header));
 	ft_putstr(")\n");
 	print_memory(head_to_mem(chunk), get_chunk_size(chunk), "\t\t");
 #endif
@@ -63,9 +63,6 @@ void print_chunks(chunk_ptr chunk) {
 			continue;
 		ft_putstr("\n");
 		print_chunk_header(chunk);
-		#ifdef FT_MALLOC_DEBUG
-
-		#endif
 	}
 }
 
@@ -84,6 +81,7 @@ void print_zones(zone_ptr zone) {
 		#endif
 		print_chunks(get_zone_first_chunk(zone));
 	}
+	ft_putchar('\n');
 }
 
 void show_alloc_mem(void) {
