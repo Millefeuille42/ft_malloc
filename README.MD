@@ -26,7 +26,7 @@ de-allocations with `munmap`
 - De-fragmented bins on free and realloc
 
 ## Mandatory part code explanation
-Lightly inspired from [debian glibc malloc](https://sources.debian.org/src/glibc/2.28-10/malloc/malloc.c/)
+Slightly inspired from [debian glibc malloc](https://sources.debian.org/src/glibc/2.28-10/malloc/malloc.c/).
 
 When words related to allocation will be put between double quotes
 it means that it is not necessarily an allocation, attributing a portion
