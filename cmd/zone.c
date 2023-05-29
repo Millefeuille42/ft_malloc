@@ -59,8 +59,10 @@ chunk_ptr zone_malloc(zone_ptr zone, size_t size, size_t real_size) {
 	}
 
 	for (; current->next; current = current->next) {
-		if (is_chunk_free(current) && get_chunk_size(current) >= size)
+		if (is_chunk_free(current) && get_chunk_size(current) >= size) {
+			set_chunk_busy(current);
 			return current;
+		}
 	}
 	if (sizeof(chunk_header) + size > get_zone_space_left_from_chunk(zone, current))
 		return NULL;

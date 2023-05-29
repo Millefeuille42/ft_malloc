@@ -9,7 +9,7 @@ void *reallocate_chunk(chunk_ptr chunk, size_t real_size) {
 	void *new_ptr = malloc(real_size);
 	if (!new_ptr)
 		return NULL;
-	ft_memcpy(head_to_mem(chunk), new_ptr, chunk->real_size);
+	ft_memcpy(new_ptr, head_to_mem(chunk), chunk->real_size);
 	free(head_to_mem(chunk));
 	return new_ptr;
 }

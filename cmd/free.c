@@ -9,6 +9,8 @@ void free(void *ptr) {
 		return;
 	chunk_ptr chunk = mem_to_head(ptr);
 	set_chunk_free(chunk);
+	if (chunk->real_size > get_chunk_size(chunk) || chunk->_size == 0 || chunk->real_size == 0)
+		return;
 
 	if (get_chunk_size(chunk) > manager.small_max_size) {
 		if (chunk->prev)
@@ -18,6 +20,7 @@ void free(void *ptr) {
 		if (chunk->next)
 			chunk->next->prev = chunk->prev;
 		munmap(chunk, get_chunk_size(chunk) + sizeof(chunk_header));
+		return;
 	}
 
 	chunk_ptr prev = NULL;
