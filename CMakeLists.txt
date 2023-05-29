@@ -6,8 +6,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall -Werror -Wextra -pedantic")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Werror -Wextra -pedantic")
 
 set(SOURCE_MALLOC
-		cmd/main.c
-		cmd/malloc.c
+        cmd/malloc.c
 		cmd/free.c
 		cmd/realloc.c
 		cmd/show_alloc_mem.c

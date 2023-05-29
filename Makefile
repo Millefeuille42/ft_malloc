@@ -1,22 +1,37 @@
 ######### Sources #########
 
-SOURCES	= 		cmd/main.c \
+SOURCES	= 		cmd/manager.c \
+                cmd/malloc.c \
+                cmd/realloc.c \
+                cmd/zone.c \
+                cmd/chunk.c \
+                cmd/show_alloc_mem.c \
+                cmd/utils.c \
+                cmd/free.c \
+                pkg/ft_print/ft_putchar.c \
+                pkg/ft_print/ft_putstr.c \
+                pkg/ft_print/ft_putnbr_base.c \
+                pkg/ft_print/ft_putnbr.c \
+
+
 
 HEADERS	=		cmd/ft_malloc.h \
+				pkg/ft_print/ft_print.h
 
 HEADERS_DIRECTORIES	=			cmd \
 
 ######### Details #########
 
-NAME	=	ft_malloc
+NAME	=	libftmalloc.a
 SOURCES_EXTENSION = c
 
 ######### Compilation #########
 
 COMPILE		=	clang
+LIB			=	ar rc
 DELETE		=	rm -f
 
-FLAGS		=	-Wall -Werror -Wextra -pedantic -Ofast
+FLAGS		=	-Wall -Werror -Wextra -pedantic# -Ofast
 
 ######### Additional Paths #########
 
@@ -48,7 +63,7 @@ endif
 all:	$(OBJS_DIR) $(DEPS_DIR) $(NAME) ## Compile project and dependencies
 
 $(NAME):	$(OBJS) ## Compile project
-			$(COMPILE) $(FLAGS) $^ -o $@
+			$(LIB) $(NAME) $(OBJS)
 
 clean: clean_deps clean_objs ## Delete object files
 
