@@ -2,6 +2,7 @@
 *.d
 *.out
 *.a
+*.so
 
 .deps
 .objs

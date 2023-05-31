@@ -22,7 +22,8 @@ HEADERS_DIRECTORIES	=			cmd \
 
 ######### Details #########
 
-NAME	=	libftmalloc.a
+NAME	=	libft_malloc.so
+SHORT_NAME = libft_malloc
 SOURCES_EXTENSION = c
 
 ######### Compilation #########
@@ -31,7 +32,7 @@ COMPILE		=	clang
 LIB			=	ar rc
 DELETE		=	rm -f
 
-FLAGS		=	-Wall -Werror -Wextra -pedantic# -Ofast
+FLAGS		=	-Wall -Werror -Wextra -pedantic
 
 ######### Additional Paths #########
 
@@ -60,10 +61,15 @@ ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
+LIB_NAME := $(SHORT_NAME)_$(HOSTTYPE).so
+
 all:	$(OBJS_DIR) $(DEPS_DIR) $(NAME) ## Compile project and dependencies
 
-$(NAME):	$(OBJS) ## Compile project
-			$(LIB) $(NAME) $(OBJS)
+$(LIB_NAME): $(OBJS)
+			$(LIB) $(LIB_NAME) $(OBJS)
+
+$(NAME):	$(LIB_NAME) ## Compile project
+			ln -s $(shell pwd)/$(LIB_NAME) $(NAME)
 
 clean: clean_deps clean_objs ## Delete object files
 
@@ -84,6 +90,7 @@ clean_deps: ## Delete dependency files and directory
 clean_objs: ## Delete object files and directory
 			$(DELETE) -r $(OBJS_DIR)
 clean_bin: ## Delete produced binary
+			$(DELETE) $(SHORT_NAME)_$(HOSTTYPE).so
 			$(DELETE) $(NAME)
 
 #########  Implicit Rules  #########
