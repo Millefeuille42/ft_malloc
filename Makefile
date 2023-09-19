@@ -69,6 +69,7 @@ $(LIB_NAME): $(OBJS)
 			$(LIB) $(LIB_NAME) $(OBJS)
 
 $(NAME):	$(LIB_NAME) ## Compile project
+			rm -f libft_malloc.so
 			ln -s $(shell pwd)/$(LIB_NAME) $(NAME)
 
 clean: clean_deps clean_objs ## Delete object files
