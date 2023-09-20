@@ -61,6 +61,10 @@ ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
+ifdef BONUS
+	FLAGS += -DMALLOC_THREADSAFE=1
+endif
+
 LIB_NAME := $(SHORT_NAME)_$(HOSTTYPE).so
 
 all:	$(OBJS_DIR) $(DEPS_DIR) $(NAME) ## Compile project and dependencies

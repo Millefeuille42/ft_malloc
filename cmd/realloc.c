@@ -6,11 +6,11 @@
 
 void *reallocate_chunk(chunk_ptr chunk, size_t real_size) {
 	// TODO this needs a buffer to really de-frag memory
-	void *new_ptr = malloc(real_size);
+	void *new_ptr = __malloc(real_size);
 	if (!new_ptr)
 		return NULL;
 	ft_memcpy(new_ptr, head_to_mem(chunk), chunk->real_size);
-	free(head_to_mem(chunk));
+	__free(head_to_mem(chunk));
 	return new_ptr;
 }
 
@@ -44,9 +44,9 @@ void *reallocate_fitted_chunk(chunk_ptr chunk, size_t real_size, size_t size) {
 	return head_to_mem(ret);
 }
 
-void *realloc(void *ptr, size_t size) {
+void *__realloc(void *ptr, size_t size) {
 	if (!ptr)
-		return malloc(size);
+		return __malloc(size);
 
 	size_t real_size = size;
 	size = compute_aligned_size(size);
@@ -88,3 +88,16 @@ void *realloc(void *ptr, size_t size) {
 
 	return reallocate_chunk(chunk, real_size);
 }
+
+#ifdef MALLOC_THREADSAFE
+void *realloc(void *ptr, size_t size) {
+	ft_putstr("locking\n");
+	pthread_mutex_lock(&manager.lock);
+	void *ret = __realloc(ptr, size);
+	ft_putstr("unlocking\n");
+	pthread_mutex_unlock(&manager.lock);
+	return ret;
+}
+#else
+void *realloc(void *ptr, size_t size) { return __realloc(ptr, size); }
+#endif

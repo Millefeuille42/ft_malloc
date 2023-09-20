@@ -4,7 +4,7 @@
 
 #include "ft_malloc.h"
 
-void free(void *ptr) {
+void __free(void *ptr) {
 	if (!ptr)
 		return;
 	chunk_ptr chunk = mem_to_head(ptr);
@@ -50,3 +50,15 @@ void free(void *ptr) {
 	*zone = (zone_header) {.prev = NULL, .next = NULL, ._size = 0, .real_size = 0};
 	munmap(zone, size);
 }
+
+#ifdef MALLOC_THREADSAFE
+void free(void *ptr) {
+	ft_putstr("locking\n");
+	pthread_mutex_lock(&manager.lock);
+	__free(ptr);
+	ft_putstr("unlocking\n");
+	pthread_mutex_unlock(&manager.lock);
+}
+#else
+void free(void *ptr) { __free(ptr); }
+#endif

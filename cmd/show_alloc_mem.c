@@ -84,9 +84,19 @@ void print_zones(zone_ptr zone) {
 	ft_putchar('\n');
 }
 
-void show_alloc_mem(void) {
+void __show_alloc_mem(void) {
 	print_zones(manager.tiny_zones);
 	print_zones(manager.small_zones);
 	print_chunks(manager.large_allocs);
 	ft_putchar('\n');
 }
+
+#ifdef MALLOC_THREADSAFE
+void show_alloc_mem(void) {
+	pthread_mutex_lock(&manager.lock);
+	__show_alloc_mem();
+	pthread_mutex_unlock(&manager.lock);
+}
+#else
+void show_alloc_mem(void) { __show_alloc_mem(); }
+#endif

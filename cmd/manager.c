@@ -4,9 +4,10 @@
 
 #include "ft_malloc.h"
 
-memory_manager manager = (memory_manager){.tiny_size = 0};
+memory_manager manager = (memory_manager){0};
 
-void init_manager(void) {
+__attribute__((constructor))
+void construct_manager(void) {
 	if (manager.tiny_size)
 		return;
 	manager.tiny_size = getpagesize() * sizeof(chunk_header) / 8;
@@ -15,4 +16,22 @@ void init_manager(void) {
 	manager.small_size = getpagesize() * (1024 * (sizeof(chunk_header) / 8));
 	manager.small_chunk_size = (manager.small_size / 128);
 	manager.small_max_size = (manager.small_chunk_size - sizeof(chunk_header));
+#ifdef MALLOC_THREADSAFE
+	pthread_mutex_init(&manager.lock, NULL);
+	if (errno) {
+		ft_fputstr("malloc: couldn't init mutex\n", 2);
+		exit(1);
+	}
+#endif
+}
+
+__attribute__((destructor))
+void destroy_manager(void) {
+#ifdef MALLOC_THREADSAFE
+	pthread_mutex_destroy(&manager.lock);
+	if (errno) {
+		ft_fputstr("malloc: couldn't destroy mutex\n", 2);
+		exit(1);
+	}
+#endif
 }

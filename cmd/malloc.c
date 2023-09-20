@@ -51,10 +51,24 @@ void *malloc_in_zone(size_t size, size_t real_size) {
 	return head_to_mem(chunk);
 }
 
-void *malloc(size_t size) {
-	init_manager();
+void *__malloc(size_t size) {
 	if (size <= 0)
 		return NULL;
 	size_t aligned_size = compute_aligned_size(size);
 	return malloc_in_zone(aligned_size, size);
 }
+
+#ifdef MALLOC_THREADSAFE
+void *malloc(size_t size) {
+	ft_putstr("locking\n");
+	pthread_mutex_lock(&manager.lock);
+	void *ret = __malloc(size);
+	ft_putstr("unlocking\n");
+	pthread_mutex_unlock(&manager.lock);
+	return ret;
+}
+#else
+void *malloc(size_t size) { return __malloc(size); }
+#endif
+
+
