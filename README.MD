@@ -149,10 +149,12 @@ In a similar fashion. if the size is too big for a bin, it will try to expand or
 if it worked, chunk's size and real size is changed accordingly and the provided pointer is returned.
 If it did not work, it will copy the chunk's data to the new chunk and return a pointer to the new chunk's data.
 
-## Bonus part code explanation (WIP)
+## Bonus part code explanation
 None of the bonuses really requires an explanation, besides eventually de-fragmentation...
 
 Preventing fragmentation is already covered in the mandatory part (to be fair, if one wants to do this bonus, it is recommended to code the mandatory part
 with de-fragmentation in mind...).
 
-Planning to make malloc thread-safe since it seems to be quite easy.
+Making the lib thread-safe is not that hard, the easiest implementation is to lock / unlock a mutex before each call of the exposed functions.
+could eventually be optimized, but for little to no gain. 
+To make it fancier, it is possible to add build time parameters to not include thread-safe logic when not required.
