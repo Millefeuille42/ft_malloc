@@ -9,7 +9,7 @@ void *allocate(void *addr, size_t size) {
 }
 
 size_t compute_aligned_size(size_t size) {
-	// Correction subjects needs us to be aligned on 16 bits, not sure of why...
+	// Correction subjects needs us to be aligned on 16 bytes, not sure of why...
 	//  using sizeof(chunk_header) makes sure that this value is halved on 32bits systems
 	return size + (sizeof(chunk_header) - (size % sizeof(chunk_header)));
 }
