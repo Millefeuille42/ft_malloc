@@ -60,10 +60,8 @@ void *__malloc(size_t size) {
 
 #ifdef MALLOC_THREADSAFE
 void *malloc(size_t size) {
-	ft_putstr("locking\n");
 	pthread_mutex_lock(&manager.lock);
 	void *ret = __malloc(size);
-	ft_putstr("unlocking\n");
 	pthread_mutex_unlock(&manager.lock);
 	return ret;
 }
