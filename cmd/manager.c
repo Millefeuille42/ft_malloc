@@ -4,20 +4,20 @@
 
 #include "ft_malloc.h"
 
-memory_manager manager = (memory_manager){0};
+memory_manager ft_malloc_manager = (memory_manager){0};
 
 __attribute__((constructor))
-void construct_manager(void) {
-	if (manager.tiny_size)
+void construct_ft_malloc_manager(void) {
+	if (ft_malloc_manager.tiny_size)
 		return;
-	manager.tiny_size = getpagesize() * sizeof(chunk_header) / 8;
-	manager.tiny_chunk_size = (manager.tiny_size / 128);
-	manager.tiny_max_size = (manager.tiny_chunk_size - sizeof(chunk_header));
-	manager.small_size = getpagesize() * (1024 * (sizeof(chunk_header) / 8));
-	manager.small_chunk_size = (manager.small_size / 128);
-	manager.small_max_size = (manager.small_chunk_size - sizeof(chunk_header));
+	ft_malloc_manager.tiny_size = getpagesize() * sizeof(chunk_header) / 8;
+	ft_malloc_manager.tiny_chunk_size = (ft_malloc_manager.tiny_size / 128);
+	ft_malloc_manager.tiny_max_size = (ft_malloc_manager.tiny_chunk_size - sizeof(chunk_header));
+	ft_malloc_manager.small_size = getpagesize() * (1024 * (sizeof(chunk_header) / 8));
+	ft_malloc_manager.small_chunk_size = (ft_malloc_manager.small_size / 128);
+	ft_malloc_manager.small_max_size = (ft_malloc_manager.small_chunk_size - sizeof(chunk_header));
 #ifdef MALLOC_THREADSAFE
-	pthread_mutex_init(&manager.lock, NULL);
+	pthread_mutex_init(&ft_malloc_manager.lock, NULL);
 	if (errno) {
 		ft_fputstr("malloc: couldn't init mutex\n", 2);
 		exit(1);
@@ -26,9 +26,9 @@ void construct_manager(void) {
 }
 
 __attribute__((destructor))
-void destroy_manager(void) {
+void destroy_ft_malloc_manager(void) {
 #ifdef MALLOC_THREADSAFE
-	pthread_mutex_destroy(&manager.lock);
+	pthread_mutex_destroy(&ft_malloc_manager.lock);
 	if (errno) {
 		ft_fputstr("malloc: couldn't destroy mutex\n", 2);
 		exit(1);

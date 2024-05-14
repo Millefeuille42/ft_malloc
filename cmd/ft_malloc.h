@@ -50,7 +50,7 @@ typedef struct s_memory_manager {
 # endif
 } memory_manager;
 
-extern memory_manager manager;
+extern memory_manager ft_malloc_manager;
 
 void init_manager(void);
 

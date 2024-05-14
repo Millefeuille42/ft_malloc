@@ -85,17 +85,17 @@ void print_zones(zone_ptr zone) {
 }
 
 void __show_alloc_mem(void) {
-	print_zones(manager.tiny_zones);
-	print_zones(manager.small_zones);
-	print_chunks(manager.large_allocs);
+	print_zones(ft_malloc_manager.tiny_zones);
+	print_zones(ft_malloc_manager.small_zones);
+	print_chunks(ft_malloc_manager.large_allocs);
 	ft_putchar('\n');
 }
 
 #ifdef MALLOC_THREADSAFE
 void show_alloc_mem(void) {
-	pthread_mutex_lock(&manager.lock);
+	pthread_mutex_lock(&ft_malloc_manager.lock);
 	__show_alloc_mem();
-	pthread_mutex_unlock(&manager.lock);
+	pthread_mutex_unlock(&ft_malloc_manager.lock);
 }
 #else
 void show_alloc_mem(void) { __show_alloc_mem(); }

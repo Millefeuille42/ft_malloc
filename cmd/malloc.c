@@ -19,7 +19,7 @@ chunk_ptr append_to_list(chunk_ptr start, chunk_ptr chunk) {
 }
 
 void *malloc_in_zone(size_t size, size_t real_size) {
-	if (size > manager.small_max_size) {
+	if (size > ft_malloc_manager.small_max_size) {
 		chunk_ptr ret = allocate(NULL, size);
 		if (!ret || errno == ENOMEM)
 			return NULL;
@@ -27,13 +27,13 @@ void *malloc_in_zone(size_t size, size_t real_size) {
 		ret->_size = size;
 		ret->real_size = real_size;
 		set_chunk_busy(ret);
-		manager.large_allocs = append_to_list(manager.large_allocs, ret);
+		ft_malloc_manager.large_allocs = append_to_list(ft_malloc_manager.large_allocs, ret);
 		return head_to_mem(ret);
 	}
 
-	zone_ptr *zone = &manager.tiny_zones;
-	if (size > manager.tiny_max_size)
-		zone = &manager.small_zones;
+	zone_ptr *zone = &ft_malloc_manager.tiny_zones;
+	if (size > ft_malloc_manager.tiny_max_size)
+		zone = &ft_malloc_manager.small_zones;
 
 	zone_ptr current = *zone;
 	for (; current; current = current->next) {
@@ -42,7 +42,7 @@ void *malloc_in_zone(size_t size, size_t real_size) {
 			return head_to_mem(ret);
 	}
 
-	*zone = new_zone(size > manager.tiny_max_size);
+	*zone = new_zone(size > ft_malloc_manager.tiny_max_size);
 	if (!*zone)
 		return NULL;
 	chunk_ptr chunk = zone_malloc(*zone, size, real_size);
@@ -60,9 +60,9 @@ void *__malloc(size_t size) {
 
 #ifdef MALLOC_THREADSAFE
 void *malloc(size_t size) {
-	pthread_mutex_lock(&manager.lock);
+	pthread_mutex_lock(&ft_malloc_manager.lock);
 	void *ret = __malloc(size);
-	pthread_mutex_unlock(&manager.lock);
+	pthread_mutex_unlock(&ft_malloc_manager.lock);
 	return ret;
 }
 #else

@@ -12,11 +12,11 @@ void __free(void *ptr) {
 	if (chunk->real_size > get_chunk_size(chunk) || chunk->_size == 0 || chunk->real_size == 0)
 		return;
 
-	if (get_chunk_size(chunk) > manager.small_max_size) {
+	if (get_chunk_size(chunk) > ft_malloc_manager.small_max_size) {
 		if (chunk->prev)
 			chunk->prev->next = chunk->next;
 		else
-			manager.large_allocs = chunk->next;
+			ft_malloc_manager.large_allocs = chunk->next;
 		if (chunk->next)
 			chunk->next->prev = chunk->prev;
 		munmap(chunk, get_chunk_size(chunk) + sizeof(chunk_header));
@@ -40,10 +40,10 @@ void __free(void *ptr) {
 	if (!zone)
 		return;
 	if (!zone->prev) {
-		if (zone == manager.tiny_zones)
-			manager.tiny_zones = NULL;
-		if (zone == manager.small_zones)
-			manager.small_zones = NULL;
+		if (zone == ft_malloc_manager.tiny_zones)
+			ft_malloc_manager.tiny_zones = NULL;
+		if (zone == ft_malloc_manager.small_zones)
+			ft_malloc_manager.small_zones = NULL;
 	} else
 		zone->prev->next = zone->next;
 	size_t size = zone->_size;
@@ -54,10 +54,10 @@ void __free(void *ptr) {
 #ifdef MALLOC_THREADSAFE
 void free(void *ptr) {
 	ft_putstr("locking\n");
-	pthread_mutex_lock(&manager.lock);
+	pthread_mutex_lock(&ft_malloc_manager.lock);
 	__free(ptr);
 	ft_putstr("unlocking\n");
-	pthread_mutex_unlock(&manager.lock);
+	pthread_mutex_unlock(&ft_malloc_manager.lock);
 }
 #else
 void free(void *ptr) { __free(ptr); }

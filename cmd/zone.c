@@ -17,11 +17,11 @@ void set_zone_tiny(zone_ptr zone) {
 }
 
 size_t get_zone_chunk_size(zone_ptr zone) {
-	return is_zone_small(zone) ? manager.small_chunk_size : manager.tiny_chunk_size;
+	return is_zone_small(zone) ? ft_malloc_manager.small_chunk_size : ft_malloc_manager.tiny_chunk_size;
 }
 
 size_t get_zone_max_size(zone_ptr zone) {
-	return is_zone_small(zone) ? manager.small_max_size : manager.tiny_max_size;
+	return is_zone_small(zone) ? ft_malloc_manager.small_max_size : ft_malloc_manager.tiny_max_size;
 }
 
 size_t get_zone_size(zone_ptr zone) {
@@ -78,9 +78,9 @@ chunk_ptr zone_malloc(zone_ptr zone, size_t size, size_t real_size) {
 }
 
 zone_ptr new_zone(int small) {
-	size_t size = manager.tiny_size;
+	size_t size = ft_malloc_manager.tiny_size;
 	if (small)
-		size = manager.small_size;
+		size = ft_malloc_manager.small_size;
 	zone_ptr ret = allocate(NULL, size);
 	if (!ret || errno == ENOMEM)
 		return NULL;
