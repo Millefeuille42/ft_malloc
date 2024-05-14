@@ -87,6 +87,7 @@ void print_zones(zone_ptr zone) {
 void __show_alloc_mem(void) {
 	print_zones(ft_malloc_manager.tiny_zones);
 	print_zones(ft_malloc_manager.small_zones);
+    ft_putstr("LARGE : ");
 	print_chunks(ft_malloc_manager.large_allocs);
 	ft_putchar('\n');
 }
