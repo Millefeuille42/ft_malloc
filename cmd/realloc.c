@@ -25,9 +25,9 @@ void *reallocate_fitted_chunk(chunk_ptr chunk, size_t real_size, size_t size) {
 	}
 
 	if (get_chunk_size(chunk) > real_size)
-		ft_memcpy(head_to_mem(ret), head_to_mem(chunk), get_chunk_size(chunk));
+        ft_memcpy(head_to_mem(ret), head_to_mem(chunk), real_size);
 	else
-		ft_memcpy(head_to_mem(ret), head_to_mem(chunk), real_size);
+        ft_memcpy(head_to_mem(ret), head_to_mem(chunk), get_chunk_size(chunk));
 
 	ret->prev = chunk->prev;
 	ret->next = chunk->next;
