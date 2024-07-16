@@ -16,6 +16,7 @@ SOURCES	= 		cmd/manager.c \
 
 
 HEADERS	=		cmd/ft_malloc.h \
+				cmd/malloc.h \
 				pkg/ft_print/ft_print.h
 
 HEADERS_DIRECTORIES	=			cmd \
@@ -28,7 +29,7 @@ SOURCES_EXTENSION = c
 
 ######### Compilation #########
 
-COMPILE		=	clang
+COMPILE		=	gcc
 LIB			=	ar rc
 DELETE		=	rm -f
 

@@ -4,6 +4,8 @@
 
 #include "ft_malloc.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 memory_manager ft_malloc_manager = (memory_manager){0};
 
 __attribute__((constructor))
