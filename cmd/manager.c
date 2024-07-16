@@ -12,10 +12,10 @@ __attribute__((constructor))
 void construct_ft_malloc_manager(void) {
 	if (ft_malloc_manager.tiny_size)
 		return;
-	ft_malloc_manager.tiny_size = getpagesize() * sizeof(chunk_header) / 8;
+	ft_malloc_manager.tiny_size = sysconf(_SC_PAGESIZE) * sizeof(chunk_header) / 8;
 	ft_malloc_manager.tiny_chunk_size = (ft_malloc_manager.tiny_size / 128);
 	ft_malloc_manager.tiny_max_size = (ft_malloc_manager.tiny_chunk_size - sizeof(chunk_header));
-	ft_malloc_manager.small_size = getpagesize() * (1024 * (sizeof(chunk_header) / 8));
+	ft_malloc_manager.small_size = sysconf(_SC_PAGESIZE) * (1024 * (sizeof(chunk_header) / 8));
 	ft_malloc_manager.small_chunk_size = (ft_malloc_manager.small_size / 128);
 	ft_malloc_manager.small_max_size = (ft_malloc_manager.small_chunk_size - sizeof(chunk_header));
 #ifdef MALLOC_THREADSAFE
